@@ -1,6 +1,6 @@
 let env = {
     repulsionForce: 15,
-    attractionForce: 0.001
+    attractionForce: 0.03
 }
 
 class Vector {

@@ -1,7 +1,7 @@
 "use strict";
 let env = {
     repulsionForce: 15,
-    attractionForce: 0.001
+    attractionForce: 0.03
 };
 class Vector {
     constructor() {
@@ -129,6 +129,10 @@ function init() {
     canvas.onmouseup = mouseUpHandler;
     canvas.onmouseleave = mouseLeaveHandler;
     canvas.onmousemove = mouseMoveHandler;
+    canvas.addEventListener("touchstart", touchStartHandler, false);
+    canvas.addEventListener("touchend", touchEndHandler, false);
+    canvas.addEventListener("touchcancel", touchCancelHandler, false);
+    canvas.addEventListener("touchmove", touchMoveHandler, false);
     reset();
     window.onresize = () => {
         reset();
@@ -153,12 +157,38 @@ function mouseMoveHandler(e) {
         draggableNode.y = e.offsetY;
     }
 }
+function touchStartHandler(e) {
+    var touches = e.changedTouches;
+    if (touches.length > 0) {
+        let t = touches[0];
+        let n = graph.nodes.find((nx) => Math.sqrt((nx.x - t.pageX) * (nx.x - t.pageX) + (nx.y - t.pageY) * (nx.y - t.pageY)) < radius);
+        if (n)
+            draggableNode = n;
+    }
+}
+function touchEndHandler(e) {
+    draggableNode = null;
+}
+function touchCancelHandler(e) {
+    draggableNode = null;
+}
+function touchMoveHandler(e) {
+    if (draggableNode != null) {
+        var touches = e.changedTouches;
+        if (touches.length > 0) {
+            let t = touches[0];
+            draggableNode.x = t.pageX;
+            draggableNode.y = t.pageY;
+        }
+    }
+}
 function reset() {
     let w = window.innerWidth;
     let h = window.innerHeight;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     graph.nodes = [];
+    let cnt = Math.floor(w * h / (170 * 170));
     for (let i = 0; i < 80; i++) {
         new GraphNode(graph, Math.random() * w, Math.random() * h, String(Math.floor(Math.random() * 100)));
     }
